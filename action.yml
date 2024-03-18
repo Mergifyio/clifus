@@ -28,7 +28,7 @@ inputs:
     default: dependencies
   PUSH_TO_FORK:
     required: false
-    description: Repository to push the pull request
+    description: Repository to push the pull request to
 
 runs:
   using: "composite"
