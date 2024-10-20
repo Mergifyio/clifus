@@ -91,7 +91,7 @@ def get_replacer_value_with_transfomers(
                 value = s.group(0)
                 break
             print_to_err_and_exit(
-                f'Regex for `find` transformer "{transformer_dict['find']}" could not be matched with value "{source_value}"',
+                f'Regex for `find` transformer "{transformer_dict["find"]}" could not be matched with value "{source_value}"',
             )
     else:
         value = source_value
