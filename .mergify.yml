@@ -1,0 +1,61 @@
+extends: .github
+shared:
+  DefaultQueueOptions: &DefaultQueueOptions
+    commit_message_template: |
+      {{ title }} (#{{ number }})
+
+      {{ body }}
+    allow_inplace_checks: true
+    merge_method: squash
+
+merge_queue:
+  max_parallel_checks: 5
+
+queue_rules:
+  - name: default
+    <<: *DefaultQueueOptions
+
+  - name: lowprio
+    <<: *DefaultQueueOptions
+    queue_conditions:
+        - author = renovate[bot]
+    merge_method: merge
+    batch_size: 7
+    batch_max_wait_time: 5min
+    commit_message_template: null
+    queue_branch_merge_method: fast-forward
+    disallow_checks_interruption_from_queues:
+      - default
+
+pull_request_rules:
+  - name: automatic merge
+    conditions:
+      - base=main
+      - label!=manual merge
+    actions:
+      queue:
+
+  - name: request review
+    conditions:
+      - -author=renovate[bot]
+      - -merged
+      - -closed
+      - "#changes-requested-reviews-by=0"
+      - review-requested!=@devs
+      - and:
+          - not:
+              or: &DefaultReviewCond
+                - "#approved-reviews-by>=2"
+                - and:
+                    - author = renovate[bot]
+    actions:
+      request_reviews:
+        teams:
+          - devs
+
+merge_protections:
+  - name: 👀 Review Requirements
+    if:
+      - label != hotfix
+    success_conditions:
+      - or: *DefaultReviewCond
